@@ -1,0 +1,73 @@
+name: Linux-amd64
+
+on:
+  push:
+    branches: [ "main" ]
+    tags:
+      - '*'
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+
+    steps:
+
+    - name: 下载 ZLMediaKit
+      uses: actions/checkout@v4
+      with:
+        repository: ZLMediaKit/ZLMediaKit
+        fetch-depth: 1
+        ref: master
+        path: .
+
+    - name: 下载submodule源码
+      run: mv -f .gitmodules_github .gitmodules && git submodule sync && git submodule update --init
+
+    - name: 下载 SRTP
+      uses: actions/checkout@v4
+      with:
+        repository: cisco/libsrtp
+        fetch-depth: 1
+        ref: v2.3.0
+        path: 3rdpart/libsrtp
+
+    - name: apt-get安装依赖库(非必选)
+      run: sudo apt-get update && sudo apt-get install -y cmake libssl-dev libsdl-dev libavcodec-dev libavutil-dev libswscale-dev libresample-dev libusrsctp-dev
+
+    - name: 编译 SRTP
+      run: cd 3rdpart/libsrtp && ./configure --enable-openssl && make -j4 && sudo make install
+
+    - name: 编译 ZLMediaKit
+      run: mkdir -p linux_build && cd linux_build && cmake .. -DENABLE_WEBRTC=true -DENABLE_FFMPEG=true && make -j $(nproc)
+
+    - name: Create ZIP Dir
+      if: startsWith(github.ref, 'refs/tags/')
+      run: mkdir ZLMediaKit-linux
+
+    - name: Copy Need Files
+      if: startsWith(github.ref, 'refs/tags/')
+      run: |
+          cp "release/linux/Debug/MediaServer" "ZLMediaKit-linux/"
+          cp "release/linux/Debug/libmk_api.so" "ZLMediaKit-linux/"
+          cp "release/linux/Debug/default.pem" "ZLMediaKit-linux/"
+          cp "release/linux/Debug/config.ini" "ZLMediaKit-linux/"
+          cp -r "release/linux/Debug/www/" "ZLMediaKit-linux/"
+      
+    - name: Package Files
+      if: startsWith(github.ref, 'refs/tags/')
+      run: tar -cvf ZLMediaKit-linux_amd64.tar ZLMediaKit-linux/
+
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v3
+      if: startsWith(github.ref, 'refs/tags/')
+      with:
+        name: ZLMediaKit-linux_amd64
+        path: ZLMediaKit-linux_amd64.tar
+
+    - name: Release artifacts
+      uses: softprops/action-gh-release@v1
+      if: startsWith(github.ref, 'refs/tags/')
+      with:
+        files: ZLMediaKit-linux_amd64.tar
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

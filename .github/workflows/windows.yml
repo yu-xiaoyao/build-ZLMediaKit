@@ -1,0 +1,74 @@
+name: Windows
+
+on:
+  push:
+    branches: [ "main" ]
+    tags:
+      - '*'
+
+jobs:
+  build:
+    runs-on: windows-2019
+
+    steps:
+
+    - name: 下载 ZLMediaKit
+      uses: actions/checkout@v4
+      with:
+        repository: ZLMediaKit/ZLMediaKit
+        fetch-depth: 1
+        ref: master
+        path: .
+
+    - name: 下载submodule源码
+      run: mv -Force .gitmodules_github .gitmodules && git submodule sync && git submodule update --init
+
+    - name: 配置 vcpkg
+      uses: lukka/run-vcpkg@v7
+      with:
+        vcpkgDirectory: '${{github.workspace}}/vcpkg'
+        vcpkgTriplet: x64-windows-static
+        # 2021.05.12
+        vcpkgGitCommitId: '5568f110b509a9fd90711978a7cb76bae75bb092'
+        vcpkgArguments: 'openssl libsrtp'
+
+    - name: 编译
+      uses: lukka/run-cmake@v3
+      with:
+        useVcpkgToolchainFile: true
+        buildDirectory: '${{github.workspace}}/build'
+        cmakeAppendedArgs: '-DCMAKE_ENABLE_WEBRTC:BOOL=ON'
+        cmakeBuildType: 'RelWithDebInfo'
+
+    - name: Create ZIP Dir
+      if: startsWith(github.ref, 'refs/tags/')
+      run: mkdir ZLMediaKit-windows
+
+    - name: Copy Need Files
+      if: startsWith(github.ref, 'refs/tags/')
+      run: |
+        Copy-Item "release/windows/RelWithDebInfo/MediaServer.exe" -Destination "ZLMediaKit-windows/"
+        Copy-Item "release/windows/RelWithDebInfo/mk_api.dll" -Destination "ZLMediaKit-windows/"
+        Copy-Item "release/windows/RelWithDebInfo/mk_api.lib" -Destination "ZLMediaKit-windows/"
+        Copy-Item "release/windows/RelWithDebInfo/default.pem" -Destination "ZLMediaKit-windows/"
+        Copy-Item "release/windows/RelWithDebInfo/config.ini" -Destination "ZLMediaKit-windows/"
+        Copy-Item "release/windows/RelWithDebInfo/www/" -Destination "ZLMediaKit-windows/" -Recurse
+
+    - name: Package Files
+      if: startsWith(github.ref, 'refs/tags/')
+      run: Compress-Archive -Path ZLMediaKit-windows/* -DestinationPath ZLMediaKit-windows.zip
+
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v3
+      if: startsWith(github.ref, 'refs/tags/')
+      with:
+        name: ZLMediaKit-windows
+        path: ZLMediaKit-windows.zip
+
+    - name: Release artifacts
+      uses: softprops/action-gh-release@v1
+      if: startsWith(github.ref, 'refs/tags/')
+      with:
+        files: ZLMediaKit-windows.zip
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
