@@ -61,6 +61,7 @@ jobs:
           cp "release/linux/Debug/default.pem" "ZLMediaKit-linux/"
           cp "release/linux/Debug/config.ini" "ZLMediaKit-linux/"
           cp -r "release/linux/Debug/www/" "ZLMediaKit-linux/"
+          cp -r "api/include/" "ZLMediaKit-linux/"
       
     - name: Package Files
       if: startsWith(github.ref, 'refs/tags/')
