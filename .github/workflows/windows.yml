@@ -47,12 +47,7 @@ jobs:
     - name: Copy Need Files
       if: startsWith(github.ref, 'refs/tags/')
       run: |
-        Copy-Item "release/windows/RelWithDebInfo/MediaServer.exe" -Destination "ZLMediaKit-windows/"
-        Copy-Item "release/windows/RelWithDebInfo/mk_api.dll" -Destination "ZLMediaKit-windows/"
-        Copy-Item "release/windows/RelWithDebInfo/mk_api.lib" -Destination "ZLMediaKit-windows/"
-        Copy-Item "release/windows/RelWithDebInfo/default.pem" -Destination "ZLMediaKit-windows/"
-        Copy-Item "release/windows/RelWithDebInfo/config.ini" -Destination "ZLMediaKit-windows/"
-        Copy-Item "release/windows/RelWithDebInfo/www/" -Destination "ZLMediaKit-windows/" -Recurse
+        Copy-Item "release/windows/RelWithDebInfo/" -Destination "ZLMediaKit-windows/" -Recurse
         Copy-Item "api/include/" -Destination "ZLMediaKit-windows/" -Recurse
 
     - name: Package Files
