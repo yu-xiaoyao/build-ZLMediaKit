@@ -38,10 +38,12 @@ jobs:
       with:
         base_image: raspios_lite_arm64:latest
         cpu: cortex-a53
-        cpu_info: cpuinfo/raspberrypi_zero2_w_arm64
+        #cpu_info: cpuinfo/raspberrypi_zero2_w_arm64
+        cpu_info: raspberrypi_zero2_w_arm64_w
         image_additional_mb: 2048
         bind_mount_repository: true
         commands: |
+          grep Model /proc/cpuinfo
           sudo rm /var/lib/apt/lists/* -fv
           sudo apt-get install -y cmake libssl-dev libsdl1.2-dev libavcodec-dev libavutil-dev libswscale-dev libresample-dev libusrsctp-dev
           sudo apt-get clean
