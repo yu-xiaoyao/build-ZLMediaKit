@@ -65,11 +65,11 @@ jobs:
 
     - name: build opensll OpenSSL_1_1_1
       run: |
-        mkdir -p /usr/openssl
+        sudo mkdir -p /usr/openssl
         cd 3rdpart/openssl
         ./config no-shared --prefix=/usr/openssl
         make -j $(nproc)
-        make install
+        sudo make install
         cd ../../
 
     - name: 编译 usrsctp
@@ -79,7 +79,7 @@ jobs:
         cd build
         cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_POSITION_INDEPENDENT_CODE=ON ..
         make -j $(nproc)
-        make install
+        sudo make install
         cd ../../../
     
     - name: 编译 SRTP
@@ -87,7 +87,7 @@ jobs:
         cd 3rdpart/libsrtp
         ./configure --enable-openssl --with-openssl-dir=/usr/openssl
         make -j $(nproc)
-        make install
+        sudo make install
         cd ../../
 
     - name: 编译 ZLMediaKit
