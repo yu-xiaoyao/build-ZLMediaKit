@@ -45,6 +45,7 @@ jobs:
           grep Model /proc/cpuinfo
           apt-get update -y --allow-releaseinfo-change
           sudo apt-get install -y cmake libssl-dev libsdl1.2-dev libavcodec-dev libavutil-dev libswscale-dev libresample-dev libusrsctp-dev
+          openssl version
           sudo apt-get clean
           cd 3rdpart/libsrtp && ./configure --enable-openssl && make -j4 && sudo make install
           cd ../..
