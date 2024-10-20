@@ -67,23 +67,23 @@ jobs:
 
     - name: build opensll OpenSSL_1_1_1
       run: |
-        sudo mkdir -p /usr/openssl
+        sudo mkdir -p /usr/openssl-1.1.1w
         cd 3rdpart/openssl
-        ./config no-shared --prefix=/usr/openssl
+        ./config no-shared --prefix=/usr/openssl-1.1.1w
         make -j $(nproc)
         sudo make install
         cd ../../
 
-    - name: install old cmake
-      run: |
-        wget https://github.com/Kitware/CMake/releases/download/v3.29.5/cmake-3.29.5.tar.gz
-        tar -xf cmake-3.29.5.tar.gz
-        cd cmake-3.29.5
-        OPENSSL_ROOT_DIR=/usr/openssl ./configure
-        make -j $(nproc)
-        sudo make install
-        cd ..
-        cmake --version
+    # - name: install old cmake
+    #   run: |
+    #     wget https://github.com/Kitware/CMake/releases/download/v3.29.5/cmake-3.29.5.tar.gz
+    #     tar -xf cmake-3.29.5.tar.gz
+    #     cd cmake-3.29.5
+    #     OPENSSL_ROOT_DIR=/usr/openssl-1.1.1w ./configure
+    #     make -j $(nproc)
+    #     sudo make install
+    #     cd ..
+    #     cmake --version
 
     - name: 编译 usrsctp
       run: |
@@ -98,14 +98,14 @@ jobs:
     - name: 编译 SRTP
       run: |
         cd 3rdpart/libsrtp
-        ./configure --enable-openssl --with-openssl-dir=/usr/openssl
+        ./configure --enable-openssl --with-openssl-dir=/usr/openssl-1.1.1w
         make -j $(nproc)
         sudo make install
         cd ../../
 
     - name: 编译 ZLMediaKit
-      run: mkdir -p linux_build && cd linux_build && cmake .. -DOPENSSL_ROOT_DIR=/usr/openssl -DENABLE_WEBRTC=true -DENABLE_FFMPEG=true && make -j $(nproc)
-      # run: mkdir -p linux_build && cd linux_build && cmake .. -DOPENSSL_ROOT_DIR=/usr/openssl -DCMAKE_BUILD_TYPE=Release && make -j $(nproc)
+      run: mkdir -p linux_build && cd linux_build && cmake .. -DOPENSSL_ROOT_DIR=/usr/openssl-1.1.1w -DENABLE_WEBRTC=true -DENABLE_FFMPEG=true && make -j $(nproc)
+      # run: mkdir -p linux_build && cd linux_build && cmake .. -DOPENSSL_ROOT_DIR=/usr/openssl-1.1.1w -DCMAKE_BUILD_TYPE=Release && make -j $(nproc)
 
     - name: Create ZIP Dir
       if: startsWith(github.ref, 'refs/tags/')
