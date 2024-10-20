@@ -32,9 +32,20 @@ jobs:
         ref: v2.3.0
         path: 3rdpart/libsrtp
 
+    - name: apt update
+      run: sudo apt-get update
+
     - name: apt-get安装依赖库(非必选)
-      run: sudo apt-get update && sudo apt-get install -y cmake libssl-dev libsdl-dev libavcodec-dev libavutil-dev libswscale-dev libresample-dev libusrsctp-dev
-    
+      run: sudo apt-get install -y cmake libssl-dev libavcodec-dev libavutil-dev libswscale-dev libresample-dev libusrsctp-dev      
+
+    - name: apt-get sdl
+      continue-on-error: true
+      run: sudo apt-get install -y libsdl-dev
+
+    - name: apt-get sdl 1.2
+      continue-on-error: true
+      run: sudo apt-get install -y libsdl1.2-dev
+            
     - name: get openssl version
       continue-on-error: true
       run: openssl version
