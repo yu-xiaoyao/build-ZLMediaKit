@@ -61,7 +61,9 @@ jobs:
           apt-get update -y --allow-releaseinfo-change
           sudo apt-get install -y build-essential
           sudo apt-get install -y cmake libsdl1.2-dev libavcodec-dev libavutil-dev libswscale-dev libresample-dev libusrsctp-dev
-
+          gcc --version
+          g++ --version
+          
           sudo mkdir -p /usr/openssl-1.1.1w
           cd 3rdpart/openssl
           ./config no-shared --prefix=/usr/openssl-1.1.1w
