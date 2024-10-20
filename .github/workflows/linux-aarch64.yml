@@ -33,7 +33,7 @@ jobs:
         path: 3rdpart/openssl
 
     - name: 下载 usrsctp
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
       with:
         repository: sctplab/usrsctp
         fetch-depth: 1
@@ -60,12 +60,34 @@ jobs:
         commands: |
           grep Model /proc/cpuinfo
           apt-get update -y --allow-releaseinfo-change
-          sudo apt-get install -y cmake libssl-dev libsdl1.2-dev libavcodec-dev libavutil-dev libswscale-dev libresample-dev libusrsctp-dev
+          sudo apt-get install -y build-essential
+          sudo apt-get install -y cmake libsdl1.2-dev libavcodec-dev libavutil-dev libswscale-dev libresample-dev
+
+          sudo mkdir -p /usr/openssl-1.1.1w
+          cd 3rdpart/openssl
+          ./config no-shared --prefix=/usr/openssl-1.1.1w
+          make -j $(nproc)
+          sudo make install
+          cd ../../
+
+          cd 3rdpart/usrsctp
+          mkdir build
+          cd build
+          cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_POSITION_INDEPENDENT_CODE=ON ..
+          make -j $(nproc)
+          sudo make install
+          cd ../../../
+
+          cd 3rdpart/libsrtp
+          ./configure --enable-openssl --with-openssl-dir=/usr/openssl-1.1.1w
+          make -j $(nproc)
+          sudo make install
+          cd ../../
+
           openssl version
           sudo apt-get clean
-          cd 3rdpart/libsrtp && ./configure --enable-openssl && make -j4 && sudo make install
-          cd ../..
-          mkdir -p linux_build && cd linux_build && cmake .. -DENABLE_WEBRTC=true -DENABLE_FFMPEG=true && make -j $(nproc)
+
+          mkdir -p linux_build && cd linux_build && cmake .. -DOPENSSL_ROOT_DIR=/usr/openssl-1.1.1w -DENABLE_WEBRTC=true -DENABLE_FFMPEG=true && make -j $(nproc)
           cd ..
           
     - name: Create ZIP Dir

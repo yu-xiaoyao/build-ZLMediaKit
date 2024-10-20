@@ -55,15 +55,15 @@ jobs:
       run: cmake --version
 
     - name: apt-get安装依赖库(非必选)
-      run: sudo apt-get install -y libavcodec-dev libavutil-dev libswscale-dev libresample-dev libusrsctp-dev      
+      run: sudo apt-get install -y libavcodec-dev libavutil-dev libswscale-dev libresample-dev
 
-    - name: apt-get sdl
-      continue-on-error: true
-      run: sudo apt-get install -y libsdl-dev
-
-    # - name: apt-get sdl 1.2
+    # - name: apt-get sdl
     #   continue-on-error: true
-    #   run: sudo apt-get install -y libsdl1.2-dev
+    #   run: sudo apt-get install -y libsdl-dev
+
+    - name: apt-get sdl 1.2
+      continue-on-error: true
+      run: sudo apt-get install -y libsdl1.2-dev
 
     - name: build opensll OpenSSL_1_1_1
       run: |
