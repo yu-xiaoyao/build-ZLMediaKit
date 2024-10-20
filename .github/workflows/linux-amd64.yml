@@ -65,6 +65,15 @@ jobs:
     #   continue-on-error: true
     #   run: sudo apt-get install -y libsdl1.2-dev
 
+    - name: build opensll OpenSSL_1_1_1
+      run: |
+        sudo mkdir -p /usr/openssl
+        cd 3rdpart/openssl
+        ./config no-shared --prefix=/usr/openssl
+        make -j $(nproc)
+        sudo make install
+        cd ../../
+
     - name: install old cmake
       run: |
         wget https://github.com/Kitware/CMake/releases/download/v3.29.5/cmake-3.29.5.tar.gz
@@ -75,15 +84,6 @@ jobs:
         sudo make install
         cd ..
         cmake --version
-
-    - name: build opensll OpenSSL_1_1_1
-      run: |
-        sudo mkdir -p /usr/openssl
-        cd 3rdpart/openssl
-        ./config no-shared --prefix=/usr/openssl
-        make -j $(nproc)
-        sudo make install
-        cd ../../
 
     - name: 编译 usrsctp
       run: |
@@ -104,8 +104,8 @@ jobs:
         cd ../../
 
     - name: 编译 ZLMediaKit
-      #run: mkdir -p linux_build && cd linux_build && cmake .. -DENABLE_WEBRTC=true -DENABLE_FFMPEG=true && make -j $(nproc)
-      run: mkdir -p linux_build && cd linux_build && cmake .. -DOPENSSL_ROOT_DIR=/usr/openssl -DCMAKE_BUILD_TYPE=Release && make -j $(nproc)
+      run: mkdir -p linux_build && cd linux_build && cmake .. -DOPENSSL_ROOT_DIR=/usr/openssl -DENABLE_WEBRTC=true -DENABLE_FFMPEG=true && make -j $(nproc)
+      # run: mkdir -p linux_build && cd linux_build && cmake .. -DOPENSSL_ROOT_DIR=/usr/openssl -DCMAKE_BUILD_TYPE=Release && make -j $(nproc)
 
     - name: Create ZIP Dir
       if: startsWith(github.ref, 'refs/tags/')

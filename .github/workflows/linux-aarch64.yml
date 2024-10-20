@@ -24,6 +24,22 @@ jobs:
     - name: 下载submodule源码
       run: mv -f .gitmodules_github .gitmodules && git submodule sync && git submodule update --init
 
+    - name: Download openssl
+      uses: actions/checkout@v4
+      with:
+        repository: openssl/openssl
+        fetch-depth: 1
+        ref: OpenSSL_1_1_1
+        path: 3rdpart/openssl
+
+    - name: 下载 usrsctp
+      uses: actions/checkout@v2
+      with:
+        repository: sctplab/usrsctp
+        fetch-depth: 1
+        ref: 0.9.5.0
+        path: 3rdpart/usrsctp        
+
     - name: 下载 SRTP
       uses: actions/checkout@v4
       with:
