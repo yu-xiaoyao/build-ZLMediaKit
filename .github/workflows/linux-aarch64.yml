@@ -58,10 +58,9 @@ jobs:
         image_additional_mb: 2048
         bind_mount_repository: true
         commands: |
-          grep Model /proc/cpuinfo
           apt-get update -y --allow-releaseinfo-change
           sudo apt-get install -y build-essential
-          sudo apt-get install -y cmake libsdl1.2-dev libavcodec-dev libavutil-dev libswscale-dev libresample-dev
+          sudo apt-get install -y cmake libsdl1.2-dev libavcodec-dev libavutil-dev libswscale-dev libresample-dev libusrsctp-dev
 
           sudo mkdir -p /usr/openssl-1.1.1w
           cd 3rdpart/openssl
@@ -70,18 +69,11 @@ jobs:
           sudo make install
           cd ../../
 
-          cd 3rdpart/usrsctp
-          mkdir build
-          cd build
-          cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_POSITION_INDEPENDENT_CODE=ON ..
-          make -j $(nproc)
-          sudo make install
+          mkdir -p 3rdpart/usrsctp/build
+          cd 3rdpart/usrsctp/build && cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_POSITION_INDEPENDENT_CODE=ON .. && make -j $(nproc) && sudo make install
           cd ../../../
 
-          cd 3rdpart/libsrtp
-          ./configure --enable-openssl --with-openssl-dir=/usr/openssl-1.1.1w
-          make -j $(nproc)
-          sudo make install
+          cd 3rdpart/libsrtp && ./configure --enable-openssl --with-openssl-dir=/usr/openssl-1.1.1w && make -j $(nproc) && sudo make install
           cd ../../
 
           openssl version
