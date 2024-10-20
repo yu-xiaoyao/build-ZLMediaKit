@@ -65,6 +65,7 @@ jobs:
 
     - name: build opensll OpenSSL_1_1_1
       run: |
+        mkdir -p /usr/openssl
         cd 3rdpart/openssl
         ./config no-shared --prefix=/usr/openssl
         make -j $(nproc)
