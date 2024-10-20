@@ -50,7 +50,7 @@ jobs:
 
 
     - name: apt update install must dep
-      run: sudo apt-get update && sudo apt-get install -y build-essential cmake
+      run: sudo apt-get update && sudo apt-get install -y build-essential
     - name: get cmake version
       run: cmake --version
 
@@ -64,6 +64,17 @@ jobs:
     # - name: apt-get sdl 1.2
     #   continue-on-error: true
     #   run: sudo apt-get install -y libsdl1.2-dev
+
+    - name: install old cmake
+      run: |
+        wget https://github.com/Kitware/CMake/releases/download/v3.29.5/cmake-3.29.5.tar.gz
+        tar -xf cmake-3.29.5.tar.gz
+        cd cmake-3.29.5
+        OPENSSL_ROOT_DIR=/usr/openssl ./configure
+        make -j $(nproc)
+        sudo make install
+        cd ..
+        cmake --version
 
     - name: build opensll OpenSSL_1_1_1
       run: |
